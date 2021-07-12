@@ -1,0 +1,23 @@
+{
+  "name": "worker-msg-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitaliy-gis/worker-msg-test.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vitaliy-gis/worker-msg-test/issues"
+  },
+  "homepage": "https://github.com/vitaliy-gis/worker-msg-test#readme",
+  "dependencies": {
+    "pbf": "^3.2.1",
+    "tslib": "^2.3.0"
+  }
+}
