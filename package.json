@@ -1,5 +1,5 @@
 {
-  "name": "worker-msg-test",
+  "name": "json2pbf",
   "version": "1.0.0",
   "description": "",
   "main": "index.html",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vitaliy-gis/worker-msg-test.git"
+    "url": "git+https://github.com/itanka9/json2pbf.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/vitaliy-gis/worker-msg-test/issues"
+    "url": "https://github.com/itanka9/json2pbf/issues"
   },
-  "homepage": "https://github.com/vitaliy-gis/worker-msg-test#readme",
+  "homepage": "https://github.com/itanka9/json2pbf#readme",
   "dependencies": {
     "pbf": "^3.2.1",
     "tslib": "^2.3.0"
