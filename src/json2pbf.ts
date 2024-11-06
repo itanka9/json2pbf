@@ -17,6 +17,12 @@ export enum PackMethod {
     Row = 3
 }
 
+export enum UnpackMethod {
+    Generic = 1,
+    Columnar = 2,
+    Row = 3,
+}
+
 interface PackCtx {
     pbf: typeof Pbf;
     stringMap: { [str: string]: number };
@@ -132,46 +138,7 @@ function fromPbf(ctx: UnpackCtx, type: JsonType) {
             throw new Error(`Type ${type} is not supported`);
         }
         return decoder(ctx);
-         
-        // switch (type) {
-        //     case JsonType.Array: {
-        //         const len = pbf.readVarint();
-        //         const arr = new Array<any>(len);
-        //         for (let i = 0; i < len; i++) {
-        //             arr[i] = fromPbf(ctx, pbf.readVarint());
-        //         }
-        //         return arr;
-        //     }
-        //     case JsonType.Boolean: {
-        //         return pbf.readBoolean();
-        //     }
-        //     case JsonType.Null: {
-        //         return null;
-        //     }
-        //     case JsonType.Number: {
-        //         return pbf.readDouble();
-        //     }
-        //     case JsonType.Object: {
-        //         const len = pbf.readVarint();
-        //         const obj = {};
-        //         for (let i = 0; i < len; i++) {
-        //             var val = pbf.readVarint();
-        //             obj[ctx.keys[val >> 3]] = fromPbf(ctx, val & 0x7);
-        //         }
-        //         return obj;
-        //     }
-        //     case JsonType.String: {
-        //         return pbf.readString();
-        //     }
-        //     default:
-        //         return undefined;
-        // }
     }
-}
-export interface PackOptions {
-    pbf?: typeof Pbf,
-    method?: PackMethod,
-    columns?: Record<string, JsonType>
 }
 function writeColumns(columns: Record<string, JsonType>, pbf: typeof Pbf) {
     const length = Object.keys(columns).length;
@@ -193,7 +160,13 @@ function readColumns(pbf: typeof Pbf) {
     return columns;
 }
 
-export function pack(val: any, options?: PackOptions): ArrayBuffer {
+export interface PackOptions {
+    pbf?: typeof Pbf,
+    method?: PackMethod,
+    columns?: Record<string, JsonType>
+}
+
+export function packJson(val: any, options?: PackOptions): ArrayBuffer {
     const pbf = options?.pbf ?? new Pbf();
     const method = options?.method ?? PackMethod.Generic;
     const columns = options?.columns;
@@ -265,7 +238,11 @@ export function pack(val: any, options?: PackOptions): ArrayBuffer {
     return pbf.buf.slice(0, pbf.pos).buffer;
 }
 
-export function unpack(arr: ArrayBuffer) {
+export interface UnpackOptions {
+    method?: UnpackMethod,
+}
+
+export function unpackJson(arr: ArrayBuffer, options?: UnpackOptions) {
     if (!arr || !arr.byteLength || arr.byteLength < 4) {
         throw new Error('Bad array or insufficient array length.')
     }
@@ -276,9 +253,15 @@ export function unpack(arr: ArrayBuffer) {
     if (version > VERSION) {
         throw new Error(`Version ${version} is not supported`);
     }
-    const method = (header >> 16) & 0xff;    
-    switch (method) {
-        case PackMethod.Generic:
+    const packMethod: PackMethod = (header >> 16) & 0xff;
+    const unpackMethod: UnpackMethod = options?.method ?? UnpackMethod.Generic;
+
+    if (packMethod === PackMethod.Generic && unpackMethod !== UnpackMethod.Generic) {
+        throw new Error('Packed with PackMethod.Generic cannot be unpacked with anything than UnpackMethod.Generic');
+    }
+
+    switch (unpackMethod) {
+        case UnpackMethod.Generic:
             const keysOffset = pbf.readFixed32();
             if (keysOffset >= arr.byteLength) {
                 return;
@@ -296,7 +279,7 @@ export function unpack(arr: ArrayBuffer) {
             const startType = pbf.readVarint();
             const ctx: UnpackCtx = { keys, pbf };
             return fromPbf(ctx, startType);        
-        case PackMethod.Columnar: {
+        case UnpackMethod.Columnar: {
             const ctx: UnpackCtx = { keys: [], pbf };
             const len = pbf.readFixed32();
             const columns = readColumns(pbf);
@@ -311,7 +294,7 @@ export function unpack(arr: ArrayBuffer) {
             }
             return result;
         }
-        case PackMethod.Row: {
+        case UnpackMethod.Row: {
             const ctx: UnpackCtx = { keys: [], pbf };
             const len = pbf.readFixed32();
             const columns = readColumns(pbf);
@@ -328,8 +311,6 @@ export function unpack(arr: ArrayBuffer) {
             return result;
         }
         default:
-            throw new Error(`Method ${method} is not supported`);
-            
+            throw new Error(`Method ${unpackMethod} is not supported`);   
     }
-
 }

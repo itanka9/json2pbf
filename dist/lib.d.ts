@@ -13,11 +13,19 @@ declare module "json2pbf" {
         Columnar = 2,
         Row = 3
     }
+    export enum UnpackMethod {
+        Generic = 1,
+        Columnar = 2,
+        Row = 3
+    }
     export interface PackOptions {
         pbf?: typeof Pbf;
         method?: PackMethod;
         columns?: Record<string, JsonType>;
     }
-    export function pack(val: any, options?: PackOptions): ArrayBuffer;
-    export function unpack(arr: ArrayBuffer): any;
+    export function packJson(val: any, options?: PackOptions): ArrayBuffer;
+    export interface UnpackOptions {
+        method?: UnpackMethod;
+    }
+    export function unpackJson(arr: ArrayBuffer, options?: UnpackOptions): any;
 }
