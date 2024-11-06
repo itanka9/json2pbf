@@ -18,14 +18,14 @@ export enum PackMethod {
 }
 
 interface PackCtx {
-    pbf: Pbf;
+    pbf: typeof Pbf;
     stringMap: { [str: string]: number };
     strings: string[];
 }
 
 interface UnpackCtx {
     keys: string[];
-    pbf: Pbf;
+    pbf: typeof Pbf;
 }
 
 function indexateString(ctx: PackCtx, key: string) {
@@ -38,7 +38,7 @@ function indexateString(ctx: PackCtx, key: string) {
     return i;
 }
 
-function writeTag(pbf: Pbf, key: number, type: JsonType) {
+function writeTag(pbf: typeof Pbf, key: number, type: JsonType) {
     pbf.writeVarint((key << 3) | type);
 }
 
@@ -84,7 +84,7 @@ const decoders: Record<JsonType, (ctx: UnpackCtx) => any> = {
     [JsonType.Object]: (ctx: UnpackCtx) => {
         const { pbf } = ctx;
         const len = pbf.readVarint();
-        const obj = {};
+        const obj: any = {};
         for (let i = 0; i < len; i++) {
             var val = pbf.readVarint();
             obj[ctx.keys[val >> 3]] = fromPbf(ctx, val & 0x7);
@@ -169,11 +169,11 @@ function fromPbf(ctx: UnpackCtx, type: JsonType) {
     }
 }
 export interface PackOptions {
-    pbf?: Pbf,
+    pbf?: typeof Pbf,
     method?: PackMethod,
     columns?: Record<string, JsonType>
 }
-function writeColumns(columns: Record<string, JsonType>, pbf: Pbf) {
+function writeColumns(columns: Record<string, JsonType>, pbf: typeof Pbf) {
     const length = Object.keys(columns).length;
     pbf.writeVarint(length);
     for (const k in columns) {
@@ -182,7 +182,7 @@ function writeColumns(columns: Record<string, JsonType>, pbf: Pbf) {
     }    
 }
 
-function readColumns(pbf: Pbf) {
+function readColumns(pbf: typeof Pbf) {
     const length = pbf.readVarint();
     const columns: Array<{ key: string, type: JsonType }> = [];
     for (let i = 0; i < length; i++) {
@@ -200,8 +200,8 @@ export function pack(val: any, options?: PackOptions): ArrayBuffer {
     
     pbf.writeFixed32(VERSION << 24 | method << 16);
 
-    const strings = [];
-    const stringMap = {};
+    const strings: any[] = [];
+    const stringMap: Record<string, number> = {};
     const ctx: PackCtx = { pbf, strings, stringMap };
 
     switch (method) {
@@ -300,7 +300,7 @@ export function unpack(arr: ArrayBuffer) {
             const ctx: UnpackCtx = { keys: [], pbf };
             const len = pbf.readFixed32();
             const columns = readColumns(pbf);
-            const result = {};
+            const result: any = {};
             for (const { key, type } of columns) {
                 const decoder = decoders[type];
                 const data: any[] = [];
@@ -315,7 +315,7 @@ export function unpack(arr: ArrayBuffer) {
             const ctx: UnpackCtx = { keys: [], pbf };
             const len = pbf.readFixed32();
             const columns = readColumns(pbf);
-            const result = new Array(len).fill(0).map(() => ({}));
+            const result: any[] = new Array(len).fill(0).map(() => ({}));
             for (const { key, type } of columns) {
                 const decoder = decoders[type];
                 for (let i = 0; i < len; i++) {
