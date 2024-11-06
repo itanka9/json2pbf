@@ -1,5 +1,6 @@
-import { ITERATIONS_COUNT, JSON_TEMPLATE } from './config';
-import { packJson } from './json2pbf';
+import { ITERATIONS_COUNT, JSON_COLUMNS_TEMPLATE, JSON_TEMPLATE } from './config';
+import { JsonType, pack, PackMethod } from './json2pbf';
+import { packBfsm } from './bfsm';
 
 const oldMsgTemplate = new Float64Array(JSON_TEMPLATE as any);
 
@@ -30,7 +31,22 @@ onmessage = function ({ data }) {
             break;
         case 4:
             for (let i = 0; i < ITERATIONS_COUNT; i++) {
-                results[i] = { data: packJson(JSON_TEMPLATE) };
+                results[i] = { data: pack(JSON_TEMPLATE) };
+            }
+            break;
+        case 5: 
+            for (let i = 0; i < ITERATIONS_COUNT; i++) {
+                results[i] = { data: pack(JSON_TEMPLATE, { method: PackMethod.Row, columns: { id: JsonType.String, hidden: JsonType.Boolean } }) };
+            }
+            break;
+        case 6:
+            for (let i = 0; i < ITERATIONS_COUNT; i++) {
+                results[i] = { data: pack(JSON_COLUMNS_TEMPLATE, { method: PackMethod.Columnar, columns: { id: JsonType.String, hidden: JsonType.Boolean } }) };
+            }
+            break;
+        case 7:
+            for (let i = 0; i < ITERATIONS_COUNT; i++) {
+                results[i] = packBfsm(JSON_TEMPLATE);
             }
             break;
         default:
@@ -38,10 +54,24 @@ onmessage = function ({ data }) {
     }
     console.timeEnd('pack');
 
+    if (results[0].data instanceof ArrayBuffer) {
+        console.log(`Binary size: ${( results[0].data.byteLength / 10**6).toFixed(3)} MB`);
+    } else if ('transfer' in results[0]) {
+        console.log(`Binary size: ${( results[0].transfer[0].byteLength / 10**6).toFixed(3)} MB`);
+    }
+
     console.time('send');
     for (let i = 0; i < ITERATIONS_COUNT; i++) {
-        //@ts-ignore
-        postMessage(results[i]);
+        if (data instanceof ArrayBuffer) {
+            this.postMessage(results[i], { transfer: [data] });
+        } else if (data instanceof Float64Array) {
+            this.postMessage(results[i], { transfer: [data.buffer] });
+        } else if ('transfers' in results[i]) {
+            const { data, transfer } = results[i];
+            this.postMessage({ data }, { transfer });
+        } else {
+            this.postMessage(results[i]);
+        }
     }
     console.timeEnd('send');
 };

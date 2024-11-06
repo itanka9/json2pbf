@@ -2,6 +2,7 @@
     "extends": "./tsconfig.build.json",
     "compilerOptions": {
         "module": "esnext",
+        "lib": ["es2020", "dom"],
         "baseUrl": ".",
         "paths": {
             "@webmaps/jakarta": ["packages/jakarta/src"],
