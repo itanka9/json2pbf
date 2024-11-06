@@ -1,6 +1,6 @@
 # json2pbf
 
-Json to binary serializer in a simple and lightweight way.
+Simple JSON <-> protobuf codec
 
 ## Install 
 

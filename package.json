@@ -1,11 +1,14 @@
 {
   "name": "json2pbf",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.html",
+  "version": "1.0.1",
+  "description": "Simple JSON <-> protobuf codec",
+  "module": "./dist/lib.mjs",
+  "types": "./dist/lib.d.ts",
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "lib": "vite build -c lib.config.js",
+    "typings": "tsc ./src/json2pbf.ts --declaration --emitDeclarationOnly --outFile ./dist/lib.d.ts",
+    "build": "npm run lib && npm run typings",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

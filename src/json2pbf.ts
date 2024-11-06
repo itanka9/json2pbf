@@ -315,7 +315,10 @@ export function unpack(arr: ArrayBuffer) {
             const ctx: UnpackCtx = { keys: [], pbf };
             const len = pbf.readFixed32();
             const columns = readColumns(pbf);
-            const result: any[] = new Array(len).fill(0).map(() => ({}));
+            const result: any[] = new Array(len);
+            for (let i = 0; i < len; i++) {
+                result[i] = {};
+            }
             for (const { key, type } of columns) {
                 const decoder = decoders[type];
                 for (let i = 0; i < len; i++) {
