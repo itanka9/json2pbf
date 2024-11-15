@@ -5,11 +5,11 @@
   "module": "./dist/lib.mjs",
   "types": "./dist/lib.d.ts",
   "scripts": {
-    "start": "vite",
+    "start": "vite demo",
     "lib": "vite build -c lib.config.js",
     "typings": "tsc ./src/json2pbf.ts --declaration --emitDeclarationOnly --outFile ./dist/lib.d.ts",
     "build": "npm run lib && npm run typings",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "playwright test"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,8 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.2",
+    "@types/node": "^22.9.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.10"
   }

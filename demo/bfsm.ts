@@ -69,8 +69,8 @@ export function packBfsm(items: any[]): { data: BinaryFeatureStateMap, transfer:
   };
 }
 
-export function unpackBfsm(binaryMap: BinaryFeatureStateMap): Map<string, Record<string, any>> {
-    const result = new Map<string, Record<string, any>>();
+export function unpackBfsm(binaryMap: BinaryFeatureStateMap): any[] {
+    const result: any[] = [];
 
     const { attributes, size } = binaryMap;
 
@@ -98,17 +98,15 @@ export function unpackBfsm(binaryMap: BinaryFeatureStateMap): Map<string, Record
     }
 
     for (let i = 0; i < size; i++) {
-        // TODO https://jira.2gis.ru/browse/TILES-6351 Поддержать строковые идентификаторы, сейчас работает только с внутренними id карты
         const id = 
-            String(idAttribute.view[(i * idAttribute.stride) / 4]) +
-            String(idAttribute.view[(i * idAttribute.stride) / 4 + 1]);
+            String(idAttribute.view[(i * idAttribute.stride) / 4]);
 
         const featureState = {};
         for (const attribute of otherAttributes) {
             const value = attribute.view[(i * attribute.stride) / 4];
             featureState[attribute.name] = !Number.isNaN(value) ? value : null;
         }
-        result.set(id, featureState);
+        result.push({ id, ...featureState });
     }
 
     return result;
