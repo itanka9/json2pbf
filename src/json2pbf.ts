@@ -254,7 +254,7 @@ export function unpackJson(arr: ArrayBuffer, options?: UnpackOptions) {
         throw new Error(`Version ${version} is not supported`);
     }
     const packMethod: PackMethod = (header >> 16) & 0xff;
-    const unpackMethod: UnpackMethod = options?.method ?? UnpackMethod.Generic;
+    const unpackMethod: UnpackMethod = options?.method ?? packMethod as any;
 
     if (packMethod === PackMethod.Generic && unpackMethod !== UnpackMethod.Generic) {
         throw new Error('Packed with PackMethod.Generic cannot be unpacked with anything than UnpackMethod.Generic');
