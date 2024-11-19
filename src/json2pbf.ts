@@ -1,6 +1,6 @@
 import Pbf from 'pbf';
 
-const VERSION = 1;
+export const VERSION = 1;
 
 export enum JsonType {
     Boolean = 1,
