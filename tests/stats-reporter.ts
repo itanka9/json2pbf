@@ -22,7 +22,7 @@ class StatsReporter implements Reporter {
         const { packTime, unpackTime, receiveTime, sendTime } = stats;
         const total = packTime + unpackTime + receiveTime + sendTime;
 
-        const fmt = (n: number) => ('      '+Math.trunc(n)).slice(-6);
+        const fmt = (n: number) => Math.trunc(n);
 
         this.results[stats.codec][stats.case] = `${fmt(total)} (pack: ${fmt(packTime)}, unpack: ${fmt(unpackTime)}, receive: ${fmt(receiveTime)}, send: ${fmt(sendTime)})`;
     }
