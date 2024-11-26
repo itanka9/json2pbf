@@ -5,7 +5,7 @@ Simple JSON <-> protobuf codec
 ## Install 
 
 ```bash
-npm i -S git+https://github.com/itanka9/json2pbf.git
+npm i -S @2gis/json2pbf
 ```
 
 ## Usage
@@ -45,6 +45,14 @@ Build
 
 ```
 npm run build
+```
+
+## Publish 
+
+```
+npm version  patch | minor | major
+npm run build
+npm publish --access=public
 ```
 
 ## License
