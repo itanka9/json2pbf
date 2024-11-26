@@ -1,6 +1,6 @@
 {
   "name": "@2gis/json2pbf",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Simple JSON <-> protobuf codec",
   "module": "./dist/lib.mjs",
   "types": "./dist/lib.d.ts",
