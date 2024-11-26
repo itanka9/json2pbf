@@ -3,11 +3,11 @@
   "version": "1.1.1",
   "description": "Simple JSON <-> protobuf codec",
   "module": "./dist/lib.mjs",
-  "types": "./dist/lib.d.ts",
+  "types": "./dist/json2pbf.d.ts",
   "scripts": {
     "start": "vite demo",
     "lib": "vite build -c lib.config.js",
-    "typings": "tsc ./src/json2pbf.ts --declaration --emitDeclarationOnly --outFile ./dist/lib.d.ts",
+    "typings": "tsc ./src/json2pbf.ts --declaration --emitDeclarationOnly --outDir ./dist/",
     "build": "npm run lib && npm run typings",
     "test": "playwright test"
   },
