@@ -200,7 +200,7 @@ export function packJson(val: any, options?: PackOptions): ArrayBuffer {
             }
             const fcol = Object.keys(val)[0];
             const clen = val?.[fcol]?.length;
-            if (!clen) {
+            if (clen === undefined) {
                 throw new Error('Cannot determine columnar data length');
             }
             pbf.writeFixed32(clen);
@@ -219,8 +219,8 @@ export function packJson(val: any, options?: PackOptions): ArrayBuffer {
                 throw new Error('No columns');
             }
             const rlen = val?.length;
-            if (!rlen) {
-                throw new Error('Cannot determine columnar data length');
+            if (rlen === undefined) {
+                throw new Error('Cannot determine row data length');
             }
             pbf.writeFixed32(rlen);
             writeColumns(columns, pbf);

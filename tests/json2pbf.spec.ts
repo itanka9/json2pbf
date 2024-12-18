@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { codecs } from '../demo/config';
-import { packJson, unpackJson } from 'src/json2pbf';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { JsonType, packJson, PackMethod, PackOptions, unpackJson } from 'src/json2pbf';
+import { readFileSync } from 'fs';
 
 type Configuration = { arraySize: number, iterations: number };  
 
@@ -46,6 +46,41 @@ test.describe('basic cases', () => {
   for (const content of equalityCases) {
     test(`pack(unpack(${JSON.stringify(content)})) === ${JSON.stringify(content)}`, () => {
       expect(unpackJson(packJson(content))).toStrictEqual(content)
+    });
+  }
+
+  const rowCases = [
+    [],
+    [{ id: 'foo', hidden: 1 }],
+    [
+      { id: 'foo', hidden: 1 },
+      { id: 'bar', hidden: 0 }
+    ],
+  ];
+
+  for (const content of rowCases) {
+    const packOptions: PackOptions = {
+      method: PackMethod.Row,
+      columns: { id: JsonType.String, hidden: JsonType.Number }
+    };
+    test(`row pack(unpack(${JSON.stringify(content)})) === ${JSON.stringify(content)}`, () => {
+      expect(unpackJson(packJson(content, packOptions))).toStrictEqual(content)
+    });
+  }
+
+  const columnCases = [
+    { id: [], hidden: [] },
+    { id: ['foo'], hidden: [1] },
+    { id: ['foo', 'bar'], hidden: [1, 0] }
+  ];
+
+  for (const content of columnCases) {
+    const packOptions: PackOptions = {
+      method: PackMethod.Columnar,
+      columns: { id: JsonType.String, hidden: JsonType.Number }
+    };
+    test(`col pack(unpack(${JSON.stringify(content)})) === ${JSON.stringify(content)}`, () => {
+      expect(unpackJson(packJson(content, packOptions))).toStrictEqual(content)
     });
   }
 
